@@ -7,46 +7,65 @@
 
 import SwiftUI
 
-struct ContentView: View {
-    @State private var selectedUser: User? = nil
-    @State private var isShowingUser = false
-    
+struct UserView: View {
     var body: some View {
-        Text("Hello, World!")
-            .onTapGesture {
-                selectedUser = User()
-            }
-        // by passing optional, we bind to its nil state
-        // and safely receive unwrapped value w/o nil coalescing
-            .sheet(item: $selectedUser) { user in
-                Text(user.id)
-            }
-        
-        Text("Hello, World!")
-            .onTapGesture {
-                selectedUser = User()
-                isShowingUser.toggle()
-            }
-        // can even pass the optional to an alert
-        // as long as we track boolean state
-            .alert("Welcome", isPresented: $isShowingUser, presenting: selectedUser) { user in
-                Button(user.id) { }
-            }
-        
-        
-        Text("Hello, World!")
-            .onTapGesture {
-                selectedUser = User()
-                isShowingUser.toggle()
-            }
-        // sidebar: can even leave out the OK button,
-        // and SwiftUI will take care of a basic one for us
-            .alert("Welcome", isPresented: $isShowingUser) { }
+        // this group contains no layout information,
+        // its parent will choose how the text views get arranged
+        Group {
+            Text("Name: Keenan")
+            Text("Country: America")
+            Text("Kids: Ruth and Maggie")
+        }
+        .font(.title)
     }
 }
 
-struct User: Identifiable {
-    var id = "Taylor Swift"
+struct ContentView: View {
+    // 1a.
+    @State private var layoutVertically = false
+    
+    // 2a.
+    @Environment(\.horizontalSizeClass) var sizeClass
+    
+    var body: some View {
+       // 1b.
+        Group {
+            if layoutVertically {
+                VStack {
+                    UserView()
+                }
+            } else {
+                HStack {
+                    UserView()
+                }
+            }
+        }
+        .onTapGesture {
+            layoutVertically.toggle()
+        }
+        
+        // 2b.
+        if sizeClass == .compact {
+            VStack {
+                UserView()
+            }
+        } else {
+            HStack {
+                UserView()
+            }
+        }
+        
+        // 2c.
+        // Note: in situations where you only have one view
+        // and it doesn't take any parameters, you can
+        // pass its initializer directly to the containing stack
+        // this works exactly the same as above, but w/ cleaner code
+        if sizeClass == .compact {
+            VStack(content: UserView.init)
+        } else {
+            HStack(content: UserView.init)
+        }
+    }
 }
 
 struct ContentView_Previews: PreviewProvider {
