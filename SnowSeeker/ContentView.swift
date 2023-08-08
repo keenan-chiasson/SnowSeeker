@@ -7,63 +7,40 @@
 
 import SwiftUI
 
-struct UserView: View {
-    var body: some View {
-        // this group contains no layout information,
-        // its parent will choose how the text views get arranged
-        Group {
-            Text("Name: Keenan")
-            Text("Country: America")
-            Text("Kids: Ruth and Maggie")
-        }
-        .font(.title)
-    }
-}
-
 struct ContentView: View {
     // 1a.
-    @State private var layoutVertically = false
+    @State private var searchText = ""
     
     // 2a.
-    @Environment(\.horizontalSizeClass) var sizeClass
+    let allNames = ["Brad", "Alejandro", "Robert", "Daniel"]
     
     var body: some View {
-       // 1b.
-        Group {
-            if layoutVertically {
-                VStack {
-                    UserView()
-                }
-            } else {
-                HStack {
-                    UserView()
-                }
-            }
-        }
-        .onTapGesture {
-            layoutVertically.toggle()
+        // 1b.
+        NavigationView {
+            Text("Searching for \(searchText)")
+                .searchable(text: $searchText, prompt: "Look for something")
+                .navigationTitle("Searching")
         }
         
         // 2b.
-        if sizeClass == .compact {
-            VStack {
-                UserView()
+        NavigationView {
+            List(filteredNames, id: \.self) { name in
+                Text(name)
             }
-        } else {
-            HStack {
-                UserView()
-            }
+            .searchable(text: $searchText, prompt: "Look for someone")
+            .navigationTitle("Searching")
         }
-        
-        // 2c.
-        // Note: in situations where you only have one view
-        // and it doesn't take any parameters, you can
-        // pass its initializer directly to the containing stack
-        // this works exactly the same as above, but w/ cleaner code
-        if sizeClass == .compact {
-            VStack(content: UserView.init)
+    }
+    
+    // 2c.
+    var filteredNames: [String] {
+        if searchText.isEmpty {
+            return allNames
         } else {
-            HStack(content: UserView.init)
+            return allNames.filter {
+//                $0.contains(searchText)
+                $0.localizedCaseInsensitiveContains(searchText)
+            }
         }
     }
 }
