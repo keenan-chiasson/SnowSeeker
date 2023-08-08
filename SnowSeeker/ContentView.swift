@@ -8,39 +8,35 @@
 import SwiftUI
 
 struct ContentView: View {
-    // 1a.
-    @State private var searchText = ""
-    
-    // 2a.
-    let allNames = ["Brad", "Alejandro", "Robert", "Daniel"]
-    
+    let resorts: [Resort] = Bundle.main.decode("resorts.json")
     var body: some View {
-        // 1b.
         NavigationView {
-            Text("Searching for \(searchText)")
-                .searchable(text: $searchText, prompt: "Look for something")
-                .navigationTitle("Searching")
-        }
-        
-        // 2b.
-        NavigationView {
-            List(filteredNames, id: \.self) { name in
-                Text(name)
+            List(resorts) { resort in
+                NavigationLink {
+                    // TODO: Detail View
+                    Text(resort.name)
+                } label: {
+                    Image(resort.country)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 40, height: 25)
+                        .clipShape(
+                            RoundedRectangle(cornerRadius: 5)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 5)
+                                .stroke(.black, lineWidth: 1)
+                        )
+                    
+                    VStack(alignment: .leading) {
+                        Text(resort.name)
+                            .font(.headline)
+                        Text("\(resort.runs) runs")
+                            .foregroundColor(.secondary)
+                    }
+                }
             }
-            .searchable(text: $searchText, prompt: "Look for someone")
-            .navigationTitle("Searching")
-        }
-    }
-    
-    // 2c.
-    var filteredNames: [String] {
-        if searchText.isEmpty {
-            return allNames
-        } else {
-            return allNames.filter {
-//                $0.contains(searchText)
-                $0.localizedCaseInsensitiveContains(searchText)
-            }
+            .navigationTitle("Resorts")
         }
     }
 }
