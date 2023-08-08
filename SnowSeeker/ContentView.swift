@@ -8,10 +8,13 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var searchText = ""
+    
     let resorts: [Resort] = Bundle.main.decode("resorts.json")
+    
     var body: some View {
         NavigationView {
-            List(resorts) { resort in
+            List(filteredResorts) { resort in
                 NavigationLink {
                     ResortView(resort: resort)
                 } label: {
@@ -36,10 +39,19 @@ struct ContentView: View {
                 }
             }
             .navigationTitle("Resorts")
+            .searchable(text: $searchText, prompt: "Search for a resort")
             
             WelcomeView()
         }
 //        .phoneOnlyStackNavigationView()
+    }
+    
+    var filteredResorts: [Resort] {
+        if searchText.isEmpty {
+            return resorts
+        } else {
+            return resorts.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        }
     }
 }
 
